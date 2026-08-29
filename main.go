@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/alexandre-j95/gator_cli/internal/config"
 )
@@ -9,18 +10,23 @@ import (
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
-		fmt.Printf("%v", err)
-		return
+		fmt.Printf("Couldn't read config file: %v", err)
+		os.Exit(1)
 	}
-	err = cfg.SetUser("Alexandre")
+	s := state{ &cfg}
+	commands := commands{map[string]func(*state, command) error{}}
+	commands.register("login", handlerLogin)
+	input := os.Args
+	if len(input) < 2 {
+		fmt.Println("Missing command")
+		os.Exit(1)
+	}
+
+	commandStruct := command{input[1], input[2:]}
+	err = commands.run(&s, commandStruct)
 	if err != nil {
-		fmt.Printf("%v", err)
-		return
+		fmt.Printf("Error: %v", err)
+		os.Exit(1)
 	}
-	newcfg, err := config.Read()
-	if err != nil {
-		fmt.Printf("%v", err)
-		return
-	}
-	fmt.Printf("%+v", newcfg)
+	os.Exit(0)
 }
