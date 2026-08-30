@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"context"
 )
 
 func handlerLogin(s *state, cmd command) error {
@@ -10,7 +11,13 @@ func handlerLogin(s *state, cmd command) error {
 		return errors.New("no argument given")
 	}
 	username := cmd.args[0]
-	err := s.cfg.SetUser(username)
+
+	_, err := s.db.GetUser(context.Background(), username)
+	if err != nil {
+		return fmt.Errorf("User %s doesn't exist in the database", username)
+	}
+
+	err = s.cfg.SetUser(username)
 	if err != nil {
 		return err
 	}

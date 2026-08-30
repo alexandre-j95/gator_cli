@@ -23,6 +23,7 @@ func BuildConfigPath() (string, error) {
 }
 
 func (c *Config) SetUser(name string) error {
+	
 	c.CurrentUserName = name
 	if err := Write(c); err != nil {
 		return err
