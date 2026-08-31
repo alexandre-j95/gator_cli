@@ -1,12 +1,13 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
-	_ "github.com/lib/pq"
+
 	"github.com/alexandre-j95/gator_cli/internal/config"
 	"github.com/alexandre-j95/gator_cli/internal/database"
-	"database/sql"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -15,7 +16,7 @@ func main() {
 		fmt.Printf("Couldn't read config file: %v", err)
 		os.Exit(1)
 	}
-	
+
 	db, err := sql.Open("postgres", cfg.DBURL)
 	if err != nil {
 		fmt.Printf("Error opening database URL: %v\n", err)
@@ -23,13 +24,16 @@ func main() {
 	}
 
 	s := state{database.New(db), &cfg}
-	
+
 	commands := commands{map[string]func(*state, command) error{}}
-	
+
 	commands.register("login", handlerLogin)
 	commands.register("register", handlerRegister)
 	commands.register("reset", handlerReset)
 	commands.register("users", handlerUsers)
+	commands.register("agg", handlerAgg)
+	commands.register("addfeed", handlerAddFeed)
+	commands.register("feeds", handlerFeeds)
 
 	input := os.Args
 	if len(input) < 2 {
@@ -43,6 +47,6 @@ func main() {
 		fmt.Printf("Error running command: %v\n", err)
 		os.Exit(1)
 	}
-	
+
 	os.Exit(0)
 }
