@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -35,6 +36,20 @@ func handlerAddFeed(s *state, cmd command) error {
 	if err != nil {
 		return err
 	}
+	follow, err := s.db.CreateFeedFollow(
+		context.Background(),
+		database.CreateFeedFollowParams{
+			ID: uuid.New(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			UserID: currentUserStruct.ID,
+			FeedID: feed.ID,
+		})
+	if err != nil {
+		return fmt.Errorf("Error adding feed to user's follow list: %w", err)
+	}
+
+	fmt.Printf("%v\n", follow)
 
 	log.Printf("Feed id: %v\n", feed.ID)
 	log.Printf("Feed created at: %v\n", feed.CreatedAt)
