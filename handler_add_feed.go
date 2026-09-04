@@ -11,15 +11,9 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerAddFeed(s *state, cmd command) error {
+func handlerAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.args) < 2 {
 		return errors.New("missing arguments")
-	}
-
-	currentUserName := s.cfg.CurrentUserName
-	currentUserStruct, err := s.db.GetUser(context.Background(), currentUserName)
-	if err != nil {
-		return err
 	}
 
 	feed, err := s.db.CreateFeed(
@@ -30,7 +24,7 @@ func handlerAddFeed(s *state, cmd command) error {
 			UpdatedAt: time.Now(),
 			Name:      cmd.args[0],
 			Url:       cmd.args[1],
-			UserID:    currentUserStruct.ID,
+			UserID:    user.ID,
 		},
 	)
 	if err != nil {
@@ -42,7 +36,7 @@ func handlerAddFeed(s *state, cmd command) error {
 			ID: uuid.New(),
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
-			UserID: currentUserStruct.ID,
+			UserID: user.ID,
 			FeedID: feed.ID,
 		})
 	if err != nil {

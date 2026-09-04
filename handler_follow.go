@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerFollow(s *state, cmd command) error {
+func handlerFollow(s *state, cmd command, user database.User) error {
 	if len(cmd.args) < 1 {
 		return errors.New("need feed url")
 	}
@@ -19,10 +19,6 @@ func handlerFollow(s *state, cmd command) error {
 	if err != nil {
 		return fmt.Errorf("unable to find feed: %w", err)
 	}
-	currentUserStruct, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil {
-		return err
-	}
 
 	_, err = s.db.CreateFeedFollow(context.Background(),
 		database.CreateFeedFollowParams{
@@ -30,12 +26,12 @@ func handlerFollow(s *state, cmd command) error {
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			FeedID:    feed.ID,
-			UserID:    currentUserStruct.ID,
+			UserID:    user.ID,
 		})
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("User: %s is now following feed: %s", s.cfg.CurrentUserName, feed.Name)
+	fmt.Printf("User: %s is now following feed: %s", user.Name, feed.Name)
 	return nil
 }

@@ -3,19 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
+
+	"github.com/alexandre-j95/gator_cli/internal/database"
 )
 
-func handlerFollowing(s *state, cmd command) error {
-	u, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil {
-		return fmt.Errorf("error retrieving current user: %w", err)
-	}
-
-	follows, err := s.db.GetFeedFollowsForUser(context.Background(), u.ID)
+func handlerFollowing(s *state, cmd command, user database.User) error {
+	follows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil {
 		return fmt.Errorf("error retrieving feeds: %w", err)
 	}
-	fmt.Printf("The user %s is currently following:\n", u.Name)
+	fmt.Printf("The user %s is currently following:\n", user.Name)
 	for _, item := range follows {
 		fmt.Printf(" > %s\n", item.FeedName)
 	}
