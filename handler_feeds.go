@@ -19,7 +19,7 @@ func handlerFeeds(s *state, cmd command) error {
 	for _, feed := range feeds {
 		fmt.Printf("Feed: %s", feed.Name)
 		fmt.Printf("URL: %s", feed.Url)
-		fmt.Printf("Created by: %v", feed.Username)
+		fmt.Printf("Created by: %s", feed.Username.String)
 	}
 	return nil
 }
